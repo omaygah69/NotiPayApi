@@ -1,0 +1,6 @@
+@NotiPayApi_HostAddress = http://localhost:5113
+
+GET {{NotiPayApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
