@@ -24,6 +24,7 @@ public class AuthService(UserDb context, IConfiguration configuration) : IAuthSe
 	    HashPassword(user, request.Password);
 	user.UserName = request.UserName;
 	user.HashedPassword = hashed_password;
+	user.Role = "User";
 
 	context.Users.Add(user);
 	await context.SaveChangesAsync();
@@ -51,6 +52,7 @@ public class AuthService(UserDb context, IConfiguration configuration) : IAuthSe
 	{
 	    new Claim(ClaimTypes.Name, user.UserName),
 	    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+	    new Claim(ClaimTypes.Role, user.Role),
 	};
 	
 	SymmetricSecurityKey key = new(

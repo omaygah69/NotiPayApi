@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -30,6 +31,20 @@ public class AuthController(IAuthService authservice) : ControllerBase
 	if(token is null)
 	    return BadRequest("[ERROR] Invalid Username or Password");
 	return Ok(token);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin-check")]
+    public IActionResult CheckAdmin()
+    {
+	return Ok("User is Admin");
+    }
+
+    [Authorize]
+    [HttpGet]
+    public IActionResult CheckAuthenticated()
+    {
+	return Ok("User is authenticated");
     }
 
 //     private string CreateToken(User user)
