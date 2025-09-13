@@ -25,12 +25,12 @@ public class AuthController(IAuthService authservice) : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> LogIn(UserDto request)
+    public async Task<ActionResult<TokenResponseDto>> LogIn(UserDto request)
     {
-	var token = await authservice.LogInAsync(request);
-	if(token is null)
+	var result = await authservice.LogInAsync(request);
+	if(result is null)
 	    return BadRequest("[ERROR] Invalid Username or Password");
-	return Ok(token);
+	return Ok(result);
     }
 
     [Authorize(Roles = "Admin")]

@@ -10,6 +10,7 @@ using NotiPayApi.Entities;
 using NotiPayApi.Services;
 using NotiPayApi.Data;
 using System.Security.Claims;
+using System.Security.Cryptography;
 namespace NotiPayApi.Services;
 
 public class AuthService(UserDb context, IConfiguration configuration) : IAuthService
@@ -32,7 +33,7 @@ public class AuthService(UserDb context, IConfiguration configuration) : IAuthSe
 	return user;
     }
     
-    public async Task<string?> LogInAsync(UserDto request)
+    public async Task<TokenResponseDto?> LogInAsync(UserDto request)
     {
 	var user = await context.Users.FirstOrDefaultAsync(u =>
 							   u.UserName == request.UserName);
@@ -43,7 +44,12 @@ public class AuthService(UserDb context, IConfiguration configuration) : IAuthSe
 	if(verify_hash == PasswordVerificationResult.Failed)
 	    return null;
 
-	return CreateToken(user);
+	var response = new TokenResponseDto {
+	    AccessToken = CreateToken(user),
+	    RefreshToken = await GenerateAndSaveRefreshTokenAsync(user),
+	};
+	return response;
+	
     }
     
     private string CreateToken(User user)
@@ -66,5 +72,22 @@ public class AuthService(UserDb context, IConfiguration configuration) : IAuthSe
 	    signingCredentials: creds
 	);
 	return new JwtSecurityTokenHandler().WriteToken(token_descriptor);
+    }
+
+    private string GenerateRefreshToken()
+    {
+	byte[] randNum = new byte[32];
+	using var rng = RandomNumberGenerator.Create();
+	rng.GetBytes(randNum);
+	return Convert.ToBase64String(randNum);
+    }
+
+    private async Task<string> GenerateAndSaveRefreshTokenAsync(User user)
+    {
+	string refreshToken = GenerateRefreshToken();
+	user.RefreshToken = refreshToken;
+	user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+	await context.SaveChangesAsync();
+	return refreshToken;
     }
 }
