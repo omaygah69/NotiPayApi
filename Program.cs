@@ -40,7 +40,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
-
+app.MapGet("/hello", () => "Hello World from .NET API!");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

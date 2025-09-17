@@ -47,6 +47,25 @@ public class AuthController(IAuthService authservice) : ControllerBase
 	return Ok("User is authenticated");
     }
 
+   [Authorize(Roles = "Admin")]
+   [HttpGet("members")]
+   public async Task<ActionResult<List<UserResponseDto>>> GetMembers()
+   {
+       // Access the DbContext via your AuthService or inject it directly here
+       var users = await authservice.GetAllUsersAsync();
+
+       // Map to DTO
+       var response = users.Select(u => new UserResponseDto
+       {
+           Id = u.Id,
+           UserName = u.UserName,
+           Role = u.Role
+       }).ToList();
+
+       return Ok(response);
+   }
+
+
 //     private string CreateToken(User user)
 //     {
 // 	List<Claim> claims = new List<Claim>

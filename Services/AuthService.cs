@@ -47,6 +47,7 @@ public class AuthService(UserDb context, IConfiguration configuration) : IAuthSe
 	var response = new TokenResponseDto {
 	    AccessToken = CreateToken(user),
 	    RefreshToken = await GenerateAndSaveRefreshTokenAsync(user),
+	    Role = user.Role
 	};
 	return response;
 	
@@ -89,5 +90,13 @@ public class AuthService(UserDb context, IConfiguration configuration) : IAuthSe
 	user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 	await context.SaveChangesAsync();
 	return refreshToken;
+    }
+
+    public async Task<List<User>> GetAllUsersAsync()
+    {
+    // Only return necessary fields; don't expose passwords or refresh tokens
+	return await context.Users
+	    .Where(u => u.Role == "User")
+	    .ToListAsync();
     }
 }
