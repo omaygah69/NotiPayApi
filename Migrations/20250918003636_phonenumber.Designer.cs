@@ -11,8 +11,8 @@ using NotiPayApi.Data;
 namespace NotiPayApi.Migrations
 {
     [DbContext(typeof(UserDb))]
-    [Migration("20250916134753_email")]
-    partial class Email
+    [Migration("20250918003636_phonenumber")]
+    partial class Phonenumber
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,10 @@ namespace NotiPayApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("HashedPassword")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

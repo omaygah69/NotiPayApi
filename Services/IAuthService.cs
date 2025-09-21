@@ -6,6 +6,6 @@ namespace NotiPayApi.Services;
 public interface IAuthService
 {
     Task<User?> RegisterAsync(UserDto request);
-    Task<TokenResponseDto?> LogInAsync(UserDto request);
+    Task<TokenResponseDto?> LogInAsync(LoginDto request);
     Task<List<User>> GetAllUsersAsync();
 }

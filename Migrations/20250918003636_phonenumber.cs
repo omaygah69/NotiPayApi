@@ -5,13 +5,13 @@
 namespace NotiPayApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Email : Migration
+    public partial class Phonenumber : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "Email",
+                name: "PhoneNumber",
                 table: "Users",
                 type: "TEXT",
                 nullable: false,
@@ -22,7 +22,7 @@ namespace NotiPayApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Email",
+                name: "PhoneNumber",
                 table: "Users");
         }
     }
