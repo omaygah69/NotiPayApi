@@ -9,7 +9,7 @@ public class PaymentNotice
     public string Description { get; set; } = default!;
     public decimal Amount { get; set; }
     public string Currency { get; set; } = "PHP";
-    public string? UserId { get; set; }
+    public Guid UserId { get; set; }
     public User? User { get; set; }
 
     public string? XenditPaymentLinkId { get; set; }

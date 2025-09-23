@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NotiPayApi.Data;
 
@@ -10,9 +11,11 @@ using NotiPayApi.Data;
 namespace NotiPayApi.Migrations
 {
     [DbContext(typeof(UserDb))]
-    partial class UserDbModelSnapshot : ModelSnapshot
+    [Migration("20250922103003_Appointments")]
+    partial class Appointments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.8");

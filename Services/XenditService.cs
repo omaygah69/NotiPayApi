@@ -15,8 +15,16 @@ public class XenditService : IXenditService
         _apiKey = cfg["Xendit:ApiKey"] ?? throw new ArgumentNullException("Xendit:ApiKey missing");
     }
 
-    public async Task<(string PaymentId, string RedirectUrl)> CreatePaymentLinkAsync(
+    // 4-parameter version (for backward compatibility)
+    public async Task<(string linkId, string url)> CreatePaymentLinkAsync(
         string externalId, decimal amount, string currency, string? description)
+    {
+        return await CreatePaymentLinkAsync(externalId, amount, currency, description, null);
+    }
+
+    // 5-parameter version (with channelCode support)
+    public async Task<(string linkId, string url)> CreatePaymentLinkAsync(
+        string externalId, decimal amount, string currency, string? description, string? channelCode = null)
     {
         var client = _http.CreateClient("xendit");
 
@@ -45,6 +53,9 @@ public class XenditService : IXenditService
             // Don't send email from Xendit - handle it yourself
             should_send_email = false,
             
+            // Channel code support (if provided)
+            channel_code = channelCode,
+            
             // Optional: Configure available payment methods (use ONE of these approaches)
             // Approach 1: Allow all common methods
             allowed_payment_methods = new[] { "CARD", "EWALLET", "BANK_TRANSFER" },
@@ -66,9 +77,9 @@ public class XenditService : IXenditService
         using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
         // Extract invoice ID and URL
-        var paymentId = doc.RootElement.GetProperty("id").GetString()!;
-        var redirectUrl = doc.RootElement.GetProperty("invoice_url").GetString()!;
+        var linkId = doc.RootElement.GetProperty("id").GetString()!;
+        var url = doc.RootElement.GetProperty("invoice_url").GetString()!;
 
-        return (paymentId, redirectUrl);
+        return (linkId, url);
     }
 }

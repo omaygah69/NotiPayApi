@@ -5,6 +5,10 @@ namespace NotiPayApi.Services;
 
 public interface IXenditService
 {
-    Task<(string PaymentId, string RedirectUrl)> CreatePaymentLinkAsync(
-        string externalId, decimal amount, string currency, string? description);
+    Task<(string linkId, string url)> CreatePaymentLinkAsync(
+        string externalId, 
+        decimal amount, 
+        string currency, 
+        string? description, 
+        string? channelCode = null);
 }

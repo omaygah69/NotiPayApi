@@ -4,7 +4,6 @@ using NotiPayApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using NotiPayApi.Data; 
 using System.Text.Json;
 
