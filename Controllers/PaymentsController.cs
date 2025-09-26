@@ -140,7 +140,34 @@ public class PaymentNoticeController : ControllerBase
         }
     }
 
-    public record ProcessPaymentDto(string ChannelCode);
+    [HttpGet("my-unpaid")]
+    [Authorize]
+    public async Task<IActionResult> GetMyUnpaidNotices()
+    {
+	var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+	if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+	    return Unauthorized("Invalid user ID in token");
 
+	var unpaidNotices = await _svc.ListUnpaidForUserAsync(userId);
+	return Ok(unpaidNotices);
+    }
+
+    [HttpPatch("{id}/mark-paid")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> MarkPaid(Guid id, [FromBody] MarkPaidDto? dto)
+    {
+	// Use the provided paidAt or default to now
+	var paidAt = dto?.PaidAt ?? DateTime.UtcNow;
+
+	var notice = await _svc.MarkAsPaidAsync(id, paidAt);
+	if (notice == null)
+	    return NotFound("Payment notice not found");
+
+	return Ok(notice);
+    }
+
+// DTO for optional paidAt
+    public record MarkPaidDto(DateTime? PaidAt);
+    public record ProcessPaymentDto(string ChannelCode);
     public record CreateNoticeDto(Guid UserId, string Title, string Description, decimal Amount, string? Currency);
 }

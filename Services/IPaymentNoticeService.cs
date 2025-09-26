@@ -11,9 +11,11 @@ public interface IPaymentNoticeService
     Task<PaymentNotice> CreateAsync(Guid adminId, Guid userId, string title, string description, decimal amount, string currency);
     Task<PaymentNotice?> GetByIdAsync(Guid id);
     Task<IEnumerable<PaymentNotice>> ListForUserAsync(Guid userId);
+    Task<IEnumerable<PaymentNotice>> ListUnpaidForUserAsync(Guid userId); // NEW METHOD
     Task UpdateStatusAsync(Guid id, PaymentStatus status, DateTime? paidAt = null);
     Task<string> CreateOrUpdateXenditPaymentAsync(Guid noticeId, decimal amount, string currency, string channelCode, string title);
     Task UpdatePaymentLinkAsync(PaymentNotice notice);
+    Task<PaymentNotice?> MarkAsPaidAsync(Guid id, DateTime? paidAt = null);
 }
 
 public class PaymentNoticeService : IPaymentNoticeService
@@ -148,4 +150,27 @@ public class PaymentNoticeService : IPaymentNoticeService
         _db.PaymentNotices.Update(notice);
         await _db.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<PaymentNotice>> ListUnpaidForUserAsync(Guid userId)
+    {
+	return await _db.PaymentNotices
+	    .Where(p => p.UserId == userId && p.Status == PaymentStatus.Pending)
+	    .OrderByDescending(p => p.CreatedAt)
+	    .ToListAsync();
+    }
+
+    public async Task<PaymentNotice?> MarkAsPaidAsync(Guid id, DateTime? paidAt = null)
+    {
+	var notice = await _db.PaymentNotices.FindAsync(id);
+	if (notice == null) return null;
+
+	notice.Status = PaymentStatus.Paid;
+	notice.PaidAt = paidAt ?? DateTime.UtcNow;
+
+	_db.PaymentNotices.Update(notice);
+	await _db.SaveChangesAsync();
+
+	return notice;
+    }
+
 }
